@@ -54,7 +54,7 @@ def search_seeds(
         results = db.exec(statement).all()
         return results
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}") from e
 
 @app.get("/health")
 def health_check():
