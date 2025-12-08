@@ -13,9 +13,6 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL環境変数が設定されていません。")
-
 engine = create_engine(DATABASE_URL)
 
 def init_db():
