@@ -5,13 +5,21 @@ from sqlmodel import Session, select, col, or_
 from app.db import get_session
 from app.models import Seed
 
+import os
+
 app = FastAPI(title="FIT Seeds Search API")
+
+# CORS Configuration
+# In production, set ALLOWED_ORIGINS to the frontend domain (e.g., "https://your-app.railway.app")
+# Multiple origins can be comma-separated.
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "*")
+allowed_origins = allowed_origins_str.split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
