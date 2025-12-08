@@ -12,7 +12,7 @@ app = FastAPI(title="FIT Seeds Search API")
 # CORS Configuration
 # In production, set ALLOWED_ORIGINS to the frontend domain (e.g., "https://your-app.railway.app")
 # Multiple origins can be comma-separated.
-allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "*")
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:8501")
 allowed_origins = allowed_origins_str.split(",")
 
 app.add_middleware(

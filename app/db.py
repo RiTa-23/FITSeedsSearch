@@ -1,8 +1,15 @@
 from sqlmodel import SQLModel, create_engine, Session
 
 # PostgreSQL connection string
-# Using default Homebrew postgres setup: user='rita', no password, db='fitseeds', host='localhost'
-DATABASE_URL = "postgresql+psycopg://rita@localhost:5432/fitseeds"
+import os
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg://rita@localhost:5432/fitseeds"
+)
+
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL環境変数が設定されていません。")
 
 engine = create_engine(DATABASE_URL)
 
