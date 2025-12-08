@@ -16,7 +16,7 @@ query = st.text_input("Enter keyword (e.g. '5G', 'AI', 'Robotics')", "")
 
 if query:
     try:
-        response = requests.get(API_URL, params={"q": query})
+        response = requests.get(API_URL, params={"q": query},timeout=10)
         response.raise_for_status()
         data = response.json()
         
