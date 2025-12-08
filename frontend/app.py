@@ -2,7 +2,9 @@ import streamlit as st
 import requests
 import pandas as pd
 
-API_URL = "http://localhost:8000/search"
+import os
+
+API_URL = os.getenv("API_URL", "http://localhost:8000/search")
 
 st.set_page_config(page_title="FIT Seeds Search", layout="wide")
 
