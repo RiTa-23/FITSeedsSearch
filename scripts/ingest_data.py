@@ -3,9 +3,24 @@ from sqlmodel import Session, select
 from app.db import engine, init_db
 from app.models import Seed
 
+import time
+from sqlalchemy.exc import OperationalError
+
 def ingest():
-    print("Initializing database...")
-    init_db()
+    print("Connecting to database...")
+    
+    # Retry loop to wait for DB to be ready (useful for Railway cold starts)
+    for i in range(30):
+        try:
+            init_db()
+            break
+        except OperationalError as e:
+            print(f"Database not ready yet, retrying in 1s... ({e})")
+            time.sleep(1)
+            if i == 29:
+                raise e
+    
+    print("Database initialized.")
     
     csv_path = "fit_seeds_cleaned.csv"
     print(f"Reading {csv_path}...")
