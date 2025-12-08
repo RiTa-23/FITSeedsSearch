@@ -1,6 +1,11 @@
 # FITSeedsSearch
-
 福岡工業大学の研究シーズデータを対象に、フリー検索を提供するPythonWebアプリです。
+
+## 🚀 デモサイト (本番環境)
+現在、以下のURLで稼働中です。
+- **URL**: https://fitseedssearch-production.up.railway.app/
+
+---
 
 ## アプリケーション概要
 `fit_seeds_cleaned.csv` に含まれる研究課題データ（タイトル、キーワード、研究内容など）を対象に、フリーワードで横断検索を行います。
@@ -14,6 +19,9 @@
 - **Frontend**: Streamlit
 - **Database**: PostgreSQL
 - **Manager**: uv
+- **Platform**: Railway
+---
+
 
 ## ディレクトリ構成
 ```text
@@ -29,7 +37,7 @@
 └── fit_seeds_cleaned.csv
 ```
 
-## セットアップ
+## ローカルでの実行方法 (開発用)
 
 ### 1. 前提条件
 以下のツールがインストールされていること。
@@ -56,9 +64,7 @@ uv sync
 PYTHONPATH=. uv run python scripts/ingest_data.py
 ```
 
-## 使い方
-
-### 1. サーバーの起動
+### 5. サーバーの起動
 バックエンド（API）とフロントエンドを別々のターミナルで起動します。
 
 **Term 1: バックエンド**
@@ -73,5 +79,5 @@ uv run streamlit run frontend/app.py
 ```
 - Web UI: http://localhost:8501
 
-### 2. 検索の実行
+### 6. 動作確認
 ブラウザで http://localhost:8501 にアクセスし、検索ボックスにキーワード（例: "AI", "ロボット", "5G"）を入力して検索してください。
