@@ -82,5 +82,6 @@ uv run streamlit run frontend/app.py
 ### 6. 動作確認
 ブラウザで http://localhost:8501 にアクセスし、検索ボックスにキーワード（例: "AI", "ロボット", "5G"）を入力して検索してください。
 
-<img width="1470" height="793" alt="スクリーンショット 2025-12-09 13 50 43" src="https://github.com/user-attachments/assets/dd32792b-1c43-4db6-bc29-6e34ade40825" />
+<img width="1440" height="801" alt="スクリーンショット 2025-12-09 15 32 32" src="https://github.com/user-attachments/assets/33a1280d-2e27-4846-a042-865ea72b8576" />
+
 
