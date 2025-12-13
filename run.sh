@@ -18,7 +18,13 @@ if [ "$SERVICE_TYPE" = "backend" ]; then
 elif [ "$SERVICE_TYPE" = "frontend" ]; then
     echo "Starting Frontend-only mode..."
     PORT="${PORT:-8501}"
-    exec streamlit run frontend/app.py --server.port "$PORT" --server.address 0.0.0.0
+    echo "Frontend listening on port: $PORT"
+    exec streamlit run frontend/app.py \
+        --server.port "$PORT" \
+        --server.address 0.0.0.0 \
+        --server.headless true \
+        --server.enableCORS false \
+        --server.enableXsrfProtection false
 
 else
     echo "Starting Combined mode (Legacy for local dev)..."
