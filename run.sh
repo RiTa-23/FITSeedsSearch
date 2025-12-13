@@ -20,11 +20,12 @@ elif [ "$SERVICE_TYPE" = "frontend" ]; then
     PORT="${PORT:-8501}"
     echo "Frontend listening on port: $PORT"
     exec streamlit run frontend/app.py \
-        --server.port "$PORT" \
-        --server.address 0.0.0.0 \
-        --server.headless true \
-        --server.enableCORS false \
-        --server.enableXsrfProtection false
+        --server.port="$PORT" \
+        --server.address=0.0.0.0 \
+        --server.headless=true \
+        --server.enableCORS=false \
+        --server.enableXsrfProtection=false \
+        --server.fileWatcherType=none
 
 else
     echo "Starting Combined mode (Legacy for local dev)..."
@@ -75,11 +76,12 @@ else
     # Start Frontend
     PORT="${PORT:-8501}"
     streamlit run frontend/app.py \
-        --server.port "$PORT" \
-        --server.address 0.0.0.0 \
-        --server.headless true \
-        --server.enableCORS false \
-        --server.enableXsrfProtection false &
+        --server.port="$PORT" \
+        --server.address=0.0.0.0 \
+        --server.headless=true \
+        --server.enableCORS=false \
+        --server.enableXsrfProtection=false \
+        --server.fileWatcherType=none &
     FRONTEND_PID=$!
     
     # Wait for any process to exit
