@@ -1,6 +1,17 @@
 #!/bin/bash
 set -e
 
+# Configure Streamlit via Environment Variables (Common configuration)
+configure_streamlit() {
+    local port=$1
+    export STREAMLIT_SERVER_PORT="$port"
+    export STREAMLIT_SERVER_ADDRESS="0.0.0.0"
+    export STREAMLIT_SERVER_HEADLESS="true"
+    export STREAMLIT_SERVER_ENABLE_CORS="false"
+    export STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION="false"
+    export STREAMLIT_SERVER_FILE_WATCHER_TYPE="none"
+}
+
 # 2. Decide what to run based on SERVICE_TYPE
 SERVICE_TYPE="${SERVICE_TYPE:-combined}"
 echo "SERVICE_TYPE: $SERVICE_TYPE"
@@ -21,12 +32,7 @@ elif [ "$SERVICE_TYPE" = "frontend" ]; then
     echo "Frontend listening on port: $PORT"
     
     # Configure Streamlit via Environment Variables (More robust)
-    export STREAMLIT_SERVER_PORT="$PORT"
-    export STREAMLIT_SERVER_ADDRESS="0.0.0.0"
-    export STREAMLIT_SERVER_HEADLESS="true"
-    export STREAMLIT_SERVER_ENABLE_CORS="false"
-    export STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION="false"
-    export STREAMLIT_SERVER_FILE_WATCHER_TYPE="none"
+    configure_streamlit "$PORT"
     
     exec streamlit run frontend/app.py
 
@@ -75,12 +81,7 @@ else
     # Start Frontend (Publicly exposed)
     
     # Configure Streamlit via Environment Variables
-    export STREAMLIT_SERVER_PORT="$PORT"
-    export STREAMLIT_SERVER_ADDRESS="0.0.0.0"
-    export STREAMLIT_SERVER_HEADLESS="true"
-    export STREAMLIT_SERVER_ENABLE_CORS="false"
-    export STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION="false"
-    export STREAMLIT_SERVER_FILE_WATCHER_TYPE="none"
+    configure_streamlit "$PORT"
 
     echo "Starting Streamlit on 0.0.0.0:$PORT..."
     # Exec replaces the shell process with Streamlit, making it PID 1
