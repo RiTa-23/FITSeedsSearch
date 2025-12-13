@@ -46,6 +46,13 @@ else
     # 3. Determine Internal Backend Port
     # Ensure Internal Port doesn't conflict with the Public Port provided by Railway ($PORT)
     PORT="${PORT:-8501}"
+    
+    # Validate PORT is a number
+    if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
+        echo "Error: PORT must be a number, got: $PORT"
+        exit 1
+    fi
+
     INTERNAL_PORT=8000
     if [ "$PORT" -eq "$INTERNAL_PORT" ]; then
         INTERNAL_PORT=8001
