@@ -32,8 +32,20 @@ else
     uvicorn app.main:app --host 0.0.0.0 --port 8000 &
     BACKEND_PID=$!
 
-    # Trap for cleanup
-    trap 'kill $BACKEND_PID; exit' SIGTERM SIGINT
+    # Start Frontend
+    PORT="${PORT:-8501}"
+    streamlit run frontend/app.py --server.port "$PORT" --server.address 0.0.0.0 &
+    FRONTEND_PID=$!
+
+    # Cleanup function to kill both processes
+    cleanup() {
+        echo "Stopping processes..."
+        kill "$BACKEND_PID" 2>/dev/null || true
+        kill "$FRONTEND_PID" 2>/dev/null || true
+    }
+
+    # Trap for cleanup on exit or signal
+    trap 'cleanup; exit' SIGTERM SIGINT EXIT
 
     # Wait for backend
     echo "Waiting for backend..."
@@ -44,16 +56,12 @@ else
         fi
         if [ $i -eq 30 ]; then
             echo "Backend failed to start"
-            kill $BACKEND_PID
+            cleanup
             exit 1
         fi
         sleep 1
     done
-
-    # Start Frontend
-    PORT="${PORT:-8501}"
-    streamlit run frontend/app.py --server.port "$PORT" --server.address 0.0.0.0 &
-    FRONTEND_PID=$!
     
-    wait $FRONTEND_PID
+    # Wait for either process to exit (if one dies, we should probably exit)
+    wait $BACKEND_PID $FRONTEND_PID
 fi
