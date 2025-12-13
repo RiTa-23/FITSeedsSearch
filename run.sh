@@ -19,13 +19,16 @@ elif [ "$SERVICE_TYPE" = "frontend" ]; then
     echo "Starting Frontend-only mode..."
     PORT="${PORT:-8501}"
     echo "Frontend listening on port: $PORT"
-    exec streamlit run frontend/app.py \
-        --server.port="$PORT" \
-        --server.address=0.0.0.0 \
-        --server.headless=true \
-        --server.enableCORS=false \
-        --server.enableXsrfProtection=false \
-        --server.fileWatcherType=none
+    
+    # Configure Streamlit via Environment Variables (More robust)
+    export STREAMLIT_SERVER_PORT="$PORT"
+    export STREAMLIT_SERVER_ADDRESS="0.0.0.0"
+    export STREAMLIT_SERVER_HEADLESS="true"
+    export STREAMLIT_SERVER_ENABLE_CORS="false"
+    export STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION="false"
+    export STREAMLIT_SERVER_FILE_WATCHER_TYPE="none"
+    
+    exec streamlit run frontend/app.py
 
 else
     echo "Starting Combined mode (Legacy for local dev)..."
@@ -75,13 +78,16 @@ else
 
     # Start Frontend
     PORT="${PORT:-8501}"
-    streamlit run frontend/app.py \
-        --server.port="$PORT" \
-        --server.address=0.0.0.0 \
-        --server.headless=true \
-        --server.enableCORS=false \
-        --server.enableXsrfProtection=false \
-        --server.fileWatcherType=none &
+    
+    # Configure Streamlit via Environment Variables
+    export STREAMLIT_SERVER_PORT="$PORT"
+    export STREAMLIT_SERVER_ADDRESS="0.0.0.0"
+    export STREAMLIT_SERVER_HEADLESS="true"
+    export STREAMLIT_SERVER_ENABLE_CORS="false"
+    export STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION="false"
+    export STREAMLIT_SERVER_FILE_WATCHER_TYPE="none"
+
+    streamlit run frontend/app.py &
     FRONTEND_PID=$!
     
     # Wait for any process to exit
