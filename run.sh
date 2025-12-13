@@ -23,7 +23,8 @@ elif [ "$SERVICE_TYPE" = "frontend" ]; then
         --server.port "$PORT" \
         --server.address 0.0.0.0 \
         --server.headless true \
-        --server.enableCORS false
+        --server.enableCORS false \
+        --server.enableXsrfProtection false
 
 else
     echo "Starting Combined mode (Legacy for local dev)..."
@@ -77,7 +78,8 @@ else
         --server.port "$PORT" \
         --server.address 0.0.0.0 \
         --server.headless true \
-        --server.enableCORS false &
+        --server.enableCORS false \
+        --server.enableXsrfProtection false &
     FRONTEND_PID=$!
     
     # Wait for any process to exit
