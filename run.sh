@@ -37,51 +37,42 @@ else
     echo "Starting data ingestion..."
     python scripts/ingest_data.py
     
+    # 3. Determine Internal Backend Port
+    # Ensure Internal Port doesn't conflict with the Public Port provided by Railway ($PORT)
+    PORT="${PORT:-8501}"
+    INTERNAL_PORT=8000
+    if [ "$PORT" -eq "$INTERNAL_PORT" ]; then
+        INTERNAL_PORT=8001
+    fi
+    echo "Public Port: $PORT"
+    echo "Internal Backend Port: $INTERNAL_PORT"
+
     # Check for backend API URL availability
     # In combined mode, Frontend talks to Backend via localhost
     if [ -z "$API_URL" ]; then
-        export API_URL="http://127.0.0.1:8000/search"
+        export API_URL="http://127.0.0.1:$INTERNAL_PORT/search"
     fi
 
     # Start Backend in background (Internal only)
-    # Listens on localhost:8000, not exposed to outside world
-    echo "Starting Backend on 127.0.0.1:8000..."
-    uvicorn app.main:app --host 127.0.0.1 --port 8000 &
-    BACKEND_PID=$!
-    
-    # Cleanup function to kill both processes
-    cleanup() {
-        echo "Stopping processes..."
-        kill "$BACKEND_PID" 2>/dev/null || true
-        kill "$FRONTEND_PID" 2>/dev/null || true
-    }
-
-    # Trap for cleanup on exit or signal
-    trap 'cleanup; exit' SIGTERM SIGINT EXIT
+    echo "Starting Backend on 127.0.0.1:$INTERNAL_PORT..."
+    uvicorn app.main:app --host 127.0.0.1 --port "$INTERNAL_PORT" &
+    # We rely on container shutdown to kill this, as we will exec streamlit next
 
     # Wait for backend
     echo "Waiting for backend..."
     for i in {1..30}; do
-        if python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')" > /dev/null 2>&1; then
+        if python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:$INTERNAL_PORT/health')" > /dev/null 2>&1; then
             echo "Backend is ready"
             break
         fi
         if [ $i -eq 30 ]; then
             echo "Backend failed to start"
-            cleanup
             exit 1
-        fi
-        if ! kill -0 $BACKEND_PID 2>/dev/null; then
-             echo "Backend process died while starting"
-             cleanup
-             exit 1
         fi
         sleep 1
     done
 
     # Start Frontend (Publicly exposed)
-    # Streamlit listens on the port Railway provides ($PORT)
-    PORT="${PORT:-8501}"
     
     # Configure Streamlit via Environment Variables
     export STREAMLIT_SERVER_PORT="$PORT"
@@ -92,16 +83,6 @@ else
     export STREAMLIT_SERVER_FILE_WATCHER_TYPE="none"
 
     echo "Starting Streamlit on 0.0.0.0:$PORT..."
-    streamlit run frontend/app.py &
-    FRONTEND_PID=$!
-    
-    # Wait for any process to exit
-    # bash's wait -n waits for the next job to finish
-    # If either backend or frontend exits/crashes, we want to stop the other.
-    echo "Monitoring processes..."
-    wait -n $BACKEND_PID $FRONTEND_PID
-    
-    echo "One of the processes exited unexpectedly."
-    # The 'trap ... EXIT' will handle the cleanup automatically when this script exits
-    exit 1
+    # Exec replaces the shell process with Streamlit, making it PID 1
+    exec streamlit run frontend/app.py
 fi
