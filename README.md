@@ -3,7 +3,7 @@
 
 ## 🚀 デモサイト (本番環境)
 現在、以下のURLで稼働中です。
-- **URL**: https://fitseedssearch-production.up.railway.app/
+- **URL**: https://fitseedssearch.up.railway.app/
 
 ---
 
