@@ -74,7 +74,12 @@ else
 
     # Start Frontend
     PORT="${PORT:-8501}"
-    streamlit run frontend/app.py --server.port "$PORT" --server.address 0.0.0.0 &
+    streamlit run frontend/app.py \
+        --server.port "$PORT" \
+        --server.address 0.0.0.0 \
+        --server.headless true \
+        --server.enableCORS false \
+        --server.enableXsrfProtection false &
     FRONTEND_PID=$!
     
     # Wait for any process to exit
