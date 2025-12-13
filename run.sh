@@ -31,21 +31,24 @@ elif [ "$SERVICE_TYPE" = "frontend" ]; then
     exec streamlit run frontend/app.py
 
 else
-    echo "Starting Combined mode (Legacy for local dev)..."
+    echo "Starting Combined Service (Backend + Frontend)..."
     
     # Ingest Data
     echo "Starting data ingestion..."
     python scripts/ingest_data.py
     
     # Check for backend API URL availability
+    # In combined mode, Frontend talks to Backend via localhost
     if [ -z "$API_URL" ]; then
-        export API_URL="http://localhost:8000/search"
+        export API_URL="http://127.0.0.1:8000/search"
     fi
 
-    # Start Backend in background
-    uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+    # Start Backend in background (Internal only)
+    # Listens on localhost:8000, not exposed to outside world
+    echo "Starting Backend on 127.0.0.1:8000..."
+    uvicorn app.main:app --host 127.0.0.1 --port 8000 &
     BACKEND_PID=$!
-
+    
     # Cleanup function to kill both processes
     cleanup() {
         echo "Stopping processes..."
@@ -59,7 +62,7 @@ else
     # Wait for backend
     echo "Waiting for backend..."
     for i in {1..30}; do
-        if curl -f http://localhost:8000/health > /dev/null 2>&1; then
+        if curl -f http://127.0.0.1:8000/health > /dev/null 2>&1; then
             echo "Backend is ready"
             break
         fi
@@ -76,7 +79,8 @@ else
         sleep 1
     done
 
-    # Start Frontend
+    # Start Frontend (Publicly exposed)
+    # Streamlit listens on the port Railway provides ($PORT)
     PORT="${PORT:-8501}"
     
     # Configure Streamlit via Environment Variables
@@ -87,6 +91,7 @@ else
     export STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION="false"
     export STREAMLIT_SERVER_FILE_WATCHER_TYPE="none"
 
+    echo "Starting Streamlit on 0.0.0.0:$PORT..."
     streamlit run frontend/app.py &
     FRONTEND_PID=$!
     
