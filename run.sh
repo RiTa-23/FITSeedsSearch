@@ -1,17 +1,17 @@
 #!/bin/bash
 set -e
 
-# 1. Ingest Data (Common)
-echo "Starting data ingestion..."
-# PYTHONPATH is set by the Docker environment or uv
-python scripts/ingest_data.py
-
 # 2. Decide what to run based on SERVICE_TYPE
 SERVICE_TYPE="${SERVICE_TYPE:-combined}"
 echo "SERVICE_TYPE: $SERVICE_TYPE"
 
 if [ "$SERVICE_TYPE" = "backend" ]; then
     echo "Starting Backend-only mode..."
+    
+    # Ingest Data
+    echo "Starting data ingestion..."
+    python scripts/ingest_data.py
+
     # Configured for Railway default listening
     exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}"
 
@@ -22,6 +22,10 @@ elif [ "$SERVICE_TYPE" = "frontend" ]; then
 
 else
     echo "Starting Combined mode (Legacy for local dev)..."
+    
+    # Ingest Data
+    echo "Starting data ingestion..."
+    python scripts/ingest_data.py
     
     # Check for backend API URL availability
     if [ -z "$API_URL" ]; then
