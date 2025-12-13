@@ -59,9 +59,26 @@ else
             cleanup
             exit 1
         fi
+        if ! kill -0 $BACKEND_PID 2>/dev/null; then
+             echo "Backend process died while starting"
+             cleanup
+             exit 1
+        fi
         sleep 1
     done
+
+    # Start Frontend
+    PORT="${PORT:-8501}"
+    streamlit run frontend/app.py --server.port "$PORT" --server.address 0.0.0.0 &
+    FRONTEND_PID=$!
     
-    # Wait for either process to exit (if one dies, we should probably exit)
-    wait $BACKEND_PID $FRONTEND_PID
+    # Wait for any process to exit
+    # bash's wait -n waits for the next job to finish
+    # If either backend or frontend exits/crashes, we want to stop the other.
+    echo "Monitoring processes..."
+    wait -n $BACKEND_PID $FRONTEND_PID
+    
+    echo "One of the processes exited unexpectedly."
+    # The 'trap ... EXIT' will handle the cleanup automatically when this script exits
+    exit 1
 fi
