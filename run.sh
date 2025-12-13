@@ -62,7 +62,7 @@ else
     # Wait for backend
     echo "Waiting for backend..."
     for i in {1..30}; do
-        if curl -f http://127.0.0.1:8000/health > /dev/null 2>&1; then
+        if python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')" > /dev/null 2>&1; then
             echo "Backend is ready"
             break
         fi
