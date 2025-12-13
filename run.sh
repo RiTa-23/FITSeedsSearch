@@ -32,11 +32,6 @@ else
     uvicorn app.main:app --host 0.0.0.0 --port 8000 &
     BACKEND_PID=$!
 
-    # Start Frontend
-    PORT="${PORT:-8501}"
-    streamlit run frontend/app.py --server.port "$PORT" --server.address 0.0.0.0 &
-    FRONTEND_PID=$!
-
     # Cleanup function to kill both processes
     cleanup() {
         echo "Stopping processes..."
