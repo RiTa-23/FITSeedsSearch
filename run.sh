@@ -67,7 +67,7 @@ else
     # Wait for backend
     echo "Waiting for backend..."
     for i in {1..30}; do
-        if python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:$INTERNAL_PORT/health')" > /dev/null 2>&1; then
+        if python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:$INTERNAL_PORT/health', timeout=2)" > /dev/null 2>&1; then
             echo "Backend is ready"
             break
         fi
